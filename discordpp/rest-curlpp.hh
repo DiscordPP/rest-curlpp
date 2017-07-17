@@ -16,8 +16,10 @@
 #include <discordpp/restmodule.hh>
 
 namespace discordpp{
+    using json = nlohmann::json;
+
     class RestCurlPPModule : public RestModule{
-        json call(std::string target, std::string token, json body, std::string requestType){
+        json call(aios_ptr asio_ios, std::string target, std::string token, json body, std::string requestType){
             try
             {
                 std::stringstream outstream;
@@ -53,7 +55,7 @@ namespace discordpp{
 
                 try {
                     //std::cout << returned.dump() << std::endl;
-                    std::string message = returned.at("message").get<std::string>();
+                    std::string message = returned["message"].get<std::string>();
                     //std::cout << returned.dump() << std::endl;
                     if(message == "You are being rate limited."){
                         throw (ratelimit){returned["retry_after"].get<int>()};
@@ -66,7 +68,7 @@ namespace discordpp{
                 } catch ( std::domain_error & e) {
 
                 }
-
+                
                 return returned;
             }
             catch ( curlpp::LogicError & e ) {
