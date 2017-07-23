@@ -19,7 +19,10 @@ namespace discordpp{
     using json = nlohmann::json;
 
     class RestCurlPPModule : public RestModule{
-        json call(aios_ptr asio_ios, std::string target, std::string token, json body, std::string requestType){
+    public:
+        RestCurlPPModule(std::shared_ptr<asio::io_service> asio_ios, const std::string &token):
+                RestModule(asio_ios, token){}
+        json call(std::string target, std::string token, json body, std::string requestType){
             try
             {
                 std::stringstream outstream;
