@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 
 add_library(${PROJECT_NAME} INTERFACE)
-target_sources(${PROJECT_NAME} INTERFACE "${PROJECT_SOURCE_DIR}/discordpp")
+# target_sources(${PROJECT_NAME} INTERFACE "${PROJECT_SOURCE_DIR}/discordpp")
 
 add_subdirectory(lib/curlpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/curlpp/include/)
