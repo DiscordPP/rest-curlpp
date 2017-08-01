@@ -53,8 +53,16 @@ namespace discordpp{
                 }
 
                 request.perform();
-
-                json returned = json::parse(outstream.str());
+                
+                std::string resultString = outstream.str();
+                json returned;
+                try {
+                    returned = resultString.empty() ? json::parse("{}") : json::parse(resultString);
+                } catch (std::invalid_argument& e) {
+                    std::cerr << "Result is no JSON!\n";
+                    std::cerr << resultString << std::endl;
+                    throw e;
+                }
 
                 try {
                     //std::cout << returned.dump() << std::endl;
