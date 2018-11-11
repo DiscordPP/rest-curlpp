@@ -71,19 +71,17 @@ namespace discordpp{
                 } catch ( std::domain_error & e) {
 
                 }
-                
+
                 return returned;
-            }
-            catch ( curlpp::LogicError & e ) {
+            } catch ( curlpp::LogicError & e ) {
                 std::cout << "logic " << e.what() << std::endl;
-            }
-            catch ( curlpp::RuntimeError & e ) {
+            } catch ( curlpp::RuntimeError & e ) {
                 std::cout << "runtime " << e.what() << std::endl;
             }
 
             return {};
         }
-        
+
         json callWithFile(std::string target, std::string token, json body, std::string fileName, std::string requestType){
             try
             {
@@ -106,16 +104,16 @@ namespace discordpp{
                     header.push_back(std::string("Authorization: ") + token);\
                 }
                 request.setOpt(curlpp::options::HttpHeader(header));
-				
-				{//add the forms parts, which includes the json and file
-					curlpp::Forms formParts;
-					if(!body.empty()){
-						formParts.push_back(new curlpp::FormParts::Content("payload_json", body.dump()));
-					}
-					formParts.push_back(new curlpp::FormParts::File("file", fileName, "application/octet-stream"));
-					
-					request.setOpt<curlpp::options::HttpPost>(formParts);
-				}
+
+                {//add the forms parts, which includes the json and file
+                    curlpp::Forms formParts;
+                    if(!body.empty()){
+                        formParts.push_back(new curlpp::FormParts::Content("payload_json", body.dump()));
+                    }
+                    formParts.push_back(new curlpp::FormParts::File("file", fileName, "application/octet-stream"));
+
+                    request.setOpt<curlpp::options::HttpPost>(formParts);
+                }
 
                 request.perform();
 
@@ -136,13 +134,11 @@ namespace discordpp{
                 } catch ( std::domain_error & e) {
 
                 }
-                
+
                 return returned;
-            }
-            catch ( curlpp::LogicError & e ) {
+            } catch ( curlpp::LogicError & e ) {
                 std::cout << "logic " << e.what() << std::endl;
-            }
-            catch ( curlpp::RuntimeError & e ) {
+            } catch ( curlpp::RuntimeError & e ) {
                 std::cout << "runtime " << e.what() << std::endl;
             }
 
