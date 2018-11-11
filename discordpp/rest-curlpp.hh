@@ -83,6 +83,71 @@ namespace discordpp{
 
             return {};
         }
+        
+        json callWithFile(std::string target, std::string token, json body, std::string fileName, std::string requestType){
+            try
+            {
+                std::stringstream outstream;
+
+                cURLpp::Cleanup clean;
+                //curlpp::Cleanup clean;
+                curlpp::Easy request;
+                curlpp::options::WriteStream ws(&outstream);
+                request.setOpt(ws);
+                request.setOpt<curlpp::options::Url>("https://discordapp.com/api" + target);
+                request.setOpt(curlpp::options::Verbose(false));
+
+                if(!requestType.empty()) {
+                    request.setOpt(curlpp::options::CustomRequest(requestType));
+                }
+
+                std::list<std::string> header;
+                if(token != "") {
+                    header.push_back(std::string("Authorization: ") + token);\
+                }
+                request.setOpt(curlpp::options::HttpHeader(header));
+				
+				{//add the forms parts, which includes the json and file
+					curlpp::Forms formParts;
+					if(!body.empty()){
+						formParts.push_back(new curlpp::FormParts::Content("payload_json", body.dump()));
+					}
+					formParts.push_back(new curlpp::FormParts::File("file", fileName, "application/octet-stream"));
+					
+					request.setOpt<curlpp::options::HttpPost>(formParts);
+				}
+
+                request.perform();
+
+                json returned = json::parse(outstream.str());
+
+                try {
+                    //std::cout << returned.dump() << std::endl;
+                    std::string message = returned["message"].get<std::string>();
+                    //std::cout << returned.dump() << std::endl;
+                    if(message == "You are being rate limited."){
+                        throw (ratelimit){returned["retry_after"].get<int>()};
+                        //std::this_thread::sleep_for(std::chrono::milliseconds(returned["retry_after"].get<int>()));
+                    }else if(message != "") {
+                        std::cout << "Discord API sent a message: \"" << message << "\"" << std::endl;
+                    }
+                } catch ( std::out_of_range & e) {
+
+                } catch ( std::domain_error & e) {
+
+                }
+                
+                return returned;
+            }
+            catch ( curlpp::LogicError & e ) {
+                std::cout << "logic " << e.what() << std::endl;
+            }
+            catch ( curlpp::RuntimeError & e ) {
+                std::cout << "runtime " << e.what() << std::endl;
+            }
+
+            return {};
+        }
     };
 }
 
