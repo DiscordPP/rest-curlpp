@@ -39,15 +39,13 @@ namespace discordpp{
                 }
 
                 std::list<std::string> header;
-                header.push_back("Content-Type: application/json");
                 if (token != "") {
                     header.push_back(std::string("Authorization: ") + token);
                 }
-                request.setOpt(curlpp::options::HttpHeader(header));
 
                 if (fileName.empty()){
-                    if (!body.empty()) {
-                        //std::cout << attachJSON.dump() << std::endl;
+                    if(!body.empty()){
+                        header.push_back("Content-Type: application/json");
                         request.setOpt(curlpp::options::PostFields(body.dump()));
                         request.setOpt(curlpp::options::PostFieldSize(body.dump().length()));
                     }
@@ -60,7 +58,9 @@ namespace discordpp{
 
                     request.setOpt<curlpp::options::HttpPost>(formParts);
                 }
-
+                
+                request.setOpt(curlpp::options::HttpHeader(header));
+                
                 request.perform();
 
                 json returned = json::parse(outstream.str());
@@ -94,3 +94,4 @@ namespace discordpp{
 }
 
 #endif //EXAMPLE_BOT_REST_CURLPP_HH
+
