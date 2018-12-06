@@ -49,6 +49,9 @@ namespace discordpp{
                         request.setOpt(curlpp::options::PostFields(body.dump()));
                         request.setOpt(curlpp::options::PostFieldSize(body.dump().length()));
                     }
+                    else if (requestType == "POST" || requestType == "PUT") {
+                        header.push_back("Content-Length: 0");
+                    }
                 } else {
                     curlpp::Forms formParts;
                     if (!body.empty()) {
@@ -63,14 +66,14 @@ namespace discordpp{
                 
                 request.perform();
 
-                json returned = json::parse(outstream.str());
+                json returned = !outstream.str().empty() ? json::parse(outstream.str()) : json{};
 
                 try {
                     //std::cout << returned.dump() << std::endl;
                     std::string message = returned["message"].get<std::string>();
                     //std::cout << returned.dump() << std::endl;
                     if (message == "You are being rate limited.") {
-                        throw (ratelimit){returned["retry_after"].get<int>()};
+                        throw ratelimit{returned["retry_after"].get<int>()};
                         //std::this_thread::sleep_for(std::chrono::milliseconds(returned["retry_after"].get<int>()));
                     } else if (message != "") {
                         std::cout << "Discord API sent a message: \"" << message << "\"" << std::endl;
